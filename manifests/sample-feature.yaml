@@ -1,0 +1,20 @@
+apiVersion: nodecontroller.io/v1
+kind: NodeChecker
+metadata:
+  name: feature-avx
+spec:
+  type: feature
+  schedule: "* * * * *"
+  sourceNodes:
+    matchLabels:
+      node-role.kubernetes.io/worker: "true"
+  featureCheck:
+    command: |
+      if grep -q avx /proc/cpuinfo; then
+        exit 0
+      else
+        exit 1
+      fi
+    syncLabels:
+      feature.nodechecker/avx: "true"
+

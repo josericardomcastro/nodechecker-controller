@@ -1,0 +1,26 @@
+{{- if and .Values.serviceMonitor.enable -}}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "nodechecker.fullname" . }}
+  labels:
+{{ include "nodechecker.labels" . | indent 4 }}
+prometheus: {{ .Release.Name }}
+  {{- if .Values.serviceMonitor.labels }}
+  {{ toYaml .Values.serviceMonitor.labels | indent 4 }}
+  {{- end }}
+spec:
+  selector:
+    matchLabels:
+      release: {{ .Release.Name }}
+  {{- if .Values.serviceMonitor.sampleLimit }}
+  sampleLimit: {{ .Values.serviceMonitor.sampleLimit }}
+  {{- end }}
+{{- if .Values.serviceMonitor.endpoints }}
+  endpoints:
+{{ toYaml .Values.serviceMonitor.endpoints | indent 4 }}
+{{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+{{- end }}

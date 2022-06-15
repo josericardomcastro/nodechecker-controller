@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "nodechecker.fullname" . }}
+  labels:
+{{ include "nodechecker.labels" . | indent 4 }}
+{{- if .Values.controller.extraLabels }}
+{{ toYaml .Values.controller.extraLabels | indent 4 }}
+{{- end }}
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+{{ include "nodechecker.labels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ include "nodechecker.labels" . | indent 8 }}
+{{- if .Values.controller.annotations }}
+      annotations:
+{{ toYaml .Values.controller.annotations | indent 8 }}
+{{- end }}
+    spec:
+{{- if .Values.controller.hostNetwork }}
+      hostNetwork: {{ .Values.controller.hostNetwork }}
+{{- end }}
+{{- if .Values.controller.hostAliases }}
+      hostAliases:
+{{ toYaml .Values.controller.hostAliases | indent 6 }}
+{{- end }}
+      serviceAccountName: {{ include "nodechecker.serviceAccountName" . }}
+{{- if .Values.controller.imagePullSecrets }}
+      imagePullSecrets:
+        - name: {{ .Values.controller.imagePullSecrets }}
+{{- end }}
+{{- if .Values.controller.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.controller.nodeSelector | indent 8 }}
+{{- end }}
+{{- if and .Values.controller.tolerations }}
+      tolerations:
+{{ toYaml .Values.controller.tolerations | indent 8 }}
+{{- end }}
+      containers:
+        - name: controller
+          image: "josericardomcastro/nodechecker-controller:{{ .Values.controller.version }}"
+          imagePullPolicy: "{{ .Values.controller.imagePullPolicy }}"
+          {{- if .Values.controller.resources }}
+          resources:
+{{ toYaml .Values.controller.resources | indent 12 }}
+          {{- end }}
+          env:
+            - name: ENVIRONMENT
+              value: "production"
+            - name: LOG_LEVEL
+              value: "All"
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          ports:
+            - name: metrics
+              containerPort: 2112

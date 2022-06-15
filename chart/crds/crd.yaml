@@ -1,0 +1,172 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: (devel)
+  creationTimestamp: null
+  name: nodecheckers.nodecontroller.io
+spec:
+  group: nodecontroller.io
+  names:
+    kind: NodeChecker
+    listKind: NodeCheckerList
+    plural: nodecheckers
+    singular: nodechecker
+  scope: Namespaced
+  versions:
+    - additionalPrinterColumns:
+        - jsonPath: .spec.type
+          name: Type
+          type: string
+        - jsonPath: .status.lastSchedule
+          name: LastSchedule
+          type: string
+        - jsonPath: .status.lastStatus
+          name: LastStatus
+          type: string
+      name: v1
+      schema:
+        openAPIV3Schema:
+          description: NodeChecker is specification for a NodeChecker resource
+          properties:
+            apiVersion:
+              description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+              type: string
+            kind:
+              description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+              type: string
+            metadata:
+              type: object
+            spec:
+              properties:
+                connectionCheck:
+                  properties:
+                    clusterEndpoints:
+                      items:
+                        properties:
+                          endpoint:
+                            properties:
+                              name:
+                                type: string
+                              namespace:
+                                type: string
+                              syncLabels:
+                                additionalProperties:
+                                  type: string
+                                type: object
+                            required:
+                              - name
+                              - namespace
+                            type: object
+                          name:
+                            type: string
+                          syncLabels:
+                            additionalProperties:
+                              type: string
+                            type: object
+                        required:
+                          - endpoint
+                          - name
+                        type: object
+                      type: array
+                    clusterNodes:
+                      items:
+                        properties:
+                          matchLabels:
+                            additionalProperties:
+                              type: string
+                            type: object
+                          name:
+                            type: string
+                          port:
+                            type: integer
+                          protocol:
+                            type: string
+                          syncLabels:
+                            additionalProperties:
+                              type: string
+                            type: object
+                        required:
+                          - matchLabels
+                          - name
+                          - port
+                          - protocol
+                        type: object
+                      type: array
+                    external:
+                      items:
+                        properties:
+                          host:
+                            type: string
+                          name:
+                            type: string
+                          port:
+                            type: integer
+                          protocol:
+                            type: string
+                          syncLabels:
+                            additionalProperties:
+                              type: string
+                            type: object
+                        required:
+                          - host
+                          - name
+                          - port
+                          - protocol
+                        type: object
+                      type: array
+                  type: object
+                featureCheck:
+                  properties:
+                    command:
+                      type: string
+                    syncLabels:
+                      additionalProperties:
+                        type: string
+                      type: object
+                  type: object
+                schedule:
+                  type: string
+                sourceNodes:
+                  properties:
+                    matchLabels:
+                      additionalProperties:
+                        type: string
+                      type: object
+                  type: object
+                type:
+                  enum:
+                    - connection
+                    - feature
+                  type: string
+              required:
+                - schedule
+                - sourceNodes
+                - type
+              type: object
+            status:
+              properties:
+                lastSchedule:
+                  type: string
+                lastStatus:
+                  type: string
+              required:
+                - lastSchedule
+                - lastStatus
+              type: object
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

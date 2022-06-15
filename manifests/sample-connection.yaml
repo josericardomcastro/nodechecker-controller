@@ -1,0 +1,40 @@
+apiVersion: nodecontroller.io/v1
+kind: NodeChecker
+metadata:
+  name: worker-outbound
+spec:
+  type: connection
+  schedule: "* * * * *"
+  sourceNodes:
+    matchLabels:
+      node-role.kubernetes.io/worker: "true"
+  connectionCheck:
+    clusterNodes:
+      - name: masters-apiserver
+        matchLabels: 
+          node-role.kubernetes.io/control-plane: "true"
+        port: 443
+        protocol: TCP
+        syncLabels: 
+          connection.nodechecker/controlplane-nodes: "true"
+    external:
+      - name: local-network-probe
+        host: localhost
+        port: 9099
+        protocol: TCP
+        syncLabels:
+          connection.nodechecker/local-network-probe: "true"
+      - name: google-access
+        host: google.com
+        port: 80
+        protocol: TCP
+        syncLabels:
+          connection.nodechecker/google-access: "true"
+    clusterEndpoints:
+      - name: access-endpoint-dns
+        endpoint:
+          name: kube-dns
+          namespace: kube-system
+        syncLabels:
+          connection.nodechecker/endpoint-dns: "true"
+

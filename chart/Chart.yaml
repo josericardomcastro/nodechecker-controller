@@ -1,0 +1,15 @@
+apiVersion: v2
+name: nodechecker-controller
+version: 0.1.0
+appVersion: "1.0.0"
+description: kubernetes controller that checks features and connections of kubernetes nodes
+home: https://github.com/josericardomcastro/nodechecker-controller
+keywords:
+  - controller
+  - checker
+  - connections
+  - features
+maintainers:
+  - name: José Ricardo M Castro
+    email: josericardomcastro@gmail.com
+    url: https://github.com/josericardomcastro

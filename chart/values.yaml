@@ -1,0 +1,56 @@
+rbac:
+  # Specifies whether RBAC resources should be created
+  create: true
+
+serviceAccount:
+  # Specifies whether a ServiceAccount should be created
+  create: true
+  # The name of the ServiceAccount to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+controller:
+  # tag version of the image josericardomcastro/nodechecker-controller
+  version: 1.0.0
+
+  # annotations for the daemontset/pods
+  annotations: []
+  
+  # extra labels for the daemontset/pods
+  extraLabels: {}
+
+  hostNetwork: true
+  hostAliases: []
+
+  imagePullSecrets: {}
+  imagePullPolicy: IfNotPresent
+
+  resources:
+    requests:
+      cpu: 300m
+      memory: 400Mi
+    limits:
+      cpu: 500m
+      memory: 768Mi
+
+  nodeSelector: {}
+
+  tolerations:
+    - operator: Exists
+
+service:
+  enable: true
+  type: ClusterIP
+  ports:
+    - name: metrics
+      port: 80
+      targetPort: 2112
+
+serviceMonitor:
+  enable: false
+  labels: {}
+  endpoints:
+    - port: metrics
+      interval: 10s
+      path: /metrics
+  sampleLimit: 40000
